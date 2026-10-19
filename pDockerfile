@@ -1,7 +1,5 @@
-ARG DEBIAN_DIST=bookworm
-FROM buildpack-deps:$DEBIAN_DIST
+FROM buildpack-deps:bookworm
 
-ARG DEBIAN_DIST
 ARG unregistry_VERSION
 ARG BUILD_VERSION
 ARG FULL_VERSION
@@ -16,10 +14,8 @@ COPY packages/docker-pussh/output/copyright /output/usr/share/doc/docker-pussh/
 COPY packages/docker-pussh/output/changelog.Debian /output/usr/share/doc/docker-pussh/
 COPY packages/docker-pussh/output/README.md /output/usr/share/doc/docker-pussh/
 
-RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/usr/share/doc/docker-pussh/changelog.Debian
 RUN sed -i "s/FULL_VERSION/$FULL_VERSION/" /output/usr/share/doc/docker-pussh/changelog.Debian
-RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/control
 RUN sed -i "s/unregistry_VERSION/$unregistry_VERSION/" /output/DEBIAN/control
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/control
 
-RUN dpkg-deb --build /output /docker-pussh_${FULL_VERSION}.deb
+RUN dpkg-deb -Zxz --build /output /docker-pussh_${FULL_VERSION}.deb

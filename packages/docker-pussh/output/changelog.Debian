@@ -1,4 +1,4 @@
-unregistry (FULL_VERSION) DIST; urgency=low
+unregistry (FULL_VERSION) stable; urgency=low
 
 Full Changelog at https://github.com/psviderski/unregistry/releases
 

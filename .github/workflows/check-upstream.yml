@@ -28,7 +28,7 @@ jobs:
 
           UPSTREAM_REPO="psviderski/unregistry"
           VERSION_INPUT="unregistry_version"
-          TAG_PREFIX=""
+          TAG_PREFIX="v"
 
           # Latest stable upstream release tag, with the project's tag prefix stripped
           # (e.g. v1.2.3 -> 1.2.3, bun-v1.2.3 -> 1.2.3) to match this repo's version input.

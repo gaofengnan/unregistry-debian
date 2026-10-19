@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Dario Griffo <dariogriffo@gmail.com>
 Homepage: https://github.com/psviderski/unregistry
 Package: docker-pussh
-Version: unregistry_VERSION-BUILD_VERSION~DIST
+Version: unregistry_VERSION-BUILD_VERSION~griffo
 Architecture: all
 Depends: bash, openssh-client
 Recommends: docker.io | docker-ce

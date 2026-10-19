@@ -1,4 +1,3 @@
-ARG DEBIAN_DIST=bookworm
 
 # The unregistry server is not published as a release asset (upstream ships it
 # as a container image), so it is built from the tag being packaged. Go
@@ -15,9 +14,8 @@ RUN git clone --depth 1 --branch "v${unregistry_VERSION}" https://github.com/psv
 RUN cd unregistry && go mod download && go mod verify \
     && CGO_ENABLED=0 GOOS=linux GOARCH="${GOARCH}" go build -o unregistry ./cmd/unregistry
 
-FROM buildpack-deps:$DEBIAN_DIST
+FROM buildpack-deps:bookworm
 
-ARG DEBIAN_DIST
 ARG unregistry_VERSION
 ARG BUILD_VERSION
 ARG FULL_VERSION
@@ -37,11 +35,9 @@ COPY packages/unregistry/output/changelog.Debian /output/usr/share/doc/unregistr
 COPY packages/unregistry/output/README.md /output/usr/share/doc/unregistry/
 COPY packages/unregistry/output/unregistry.service /output/etc/systemd/system/
 
-RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/usr/share/doc/unregistry/changelog.Debian
 RUN sed -i "s/FULL_VERSION/$FULL_VERSION/" /output/usr/share/doc/unregistry/changelog.Debian
-RUN sed -i "s/DIST/$DEBIAN_DIST/" /output/DEBIAN/control
 RUN sed -i "s/unregistry_VERSION/$unregistry_VERSION/" /output/DEBIAN/control
 RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/control
 RUN sed -i "s/SUPPORTED_ARCHITECTURES/$ARCH/" /output/DEBIAN/control
 
-RUN dpkg-deb --build /output /unregistry_${FULL_VERSION}.deb
+RUN dpkg-deb -Zxz --build /output /unregistry_${FULL_VERSION}.deb

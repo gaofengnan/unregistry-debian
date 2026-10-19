@@ -22,8 +22,6 @@ get_goarch() {
     esac
 }
 
-declare -a DISTS=("bookworm" "trixie" "forky" "sid")
-
 build_architecture() {
     local build_arch=$1
     local goarch
@@ -37,62 +35,59 @@ build_architecture() {
 
     echo "Building unregistry for architecture: $build_arch (GOARCH=$goarch)"
 
-    for dist in "${DISTS[@]}"; do
-        FULL_VERSION="$unregistry_VERSION-${BUILD_VERSION}~${dist}_${build_arch}"
-        echo "  Building $FULL_VERSION"
+    # One package per architecture for every suite: the Go build is static
+    # (CGO_ENABLED=0), so only the old ~<suite> version suffix ever differed.
+    # The fixed ~griffo keeps it below the distro's own build of the version.
+    FULL_VERSION="$unregistry_VERSION-${BUILD_VERSION}~griffo_${build_arch}"
+    echo "  Building $FULL_VERSION"
 
-        if ! docker build . -f uDockerfile -t "unregistry-$dist-$build_arch" \
-            --build-arg DEBIAN_DIST="$dist" \
-            --build-arg unregistry_VERSION="$unregistry_VERSION" \
-            --build-arg BUILD_VERSION="$BUILD_VERSION" \
-            --build-arg FULL_VERSION="$FULL_VERSION" \
-            --build-arg ARCH="$build_arch" \
-            --build-arg GOARCH="$goarch"; then
-            echo "❌ Failed to build unregistry image for $dist on $build_arch"
-            return 1
-        fi
+    if ! docker build . -f uDockerfile -t "unregistry-$build_arch" \
+        --build-arg unregistry_VERSION="$unregistry_VERSION" \
+        --build-arg BUILD_VERSION="$BUILD_VERSION" \
+        --build-arg FULL_VERSION="$FULL_VERSION" \
+        --build-arg ARCH="$build_arch" \
+        --build-arg GOARCH="$goarch"; then
+        echo "❌ Failed to build unregistry image for $build_arch"
+        return 1
+    fi
 
-        id="$(docker create "unregistry-$dist-$build_arch")"
-        if ! docker cp "$id:/unregistry_$FULL_VERSION.deb" - > "./unregistry_$FULL_VERSION.deb"; then
-            echo "❌ Failed to extract unregistry .deb for $dist on $build_arch"
-            return 1
-        fi
-        if ! tar -xf "./unregistry_$FULL_VERSION.deb"; then
-            echo "❌ Failed to extract unregistry .deb contents for $dist on $build_arch"
-            return 1
-        fi
-    done
+    id="$(docker create "unregistry-$build_arch")"
+    if ! docker cp "$id:/unregistry_$FULL_VERSION.deb" - > "./unregistry_$FULL_VERSION.deb"; then
+        echo "❌ Failed to extract unregistry .deb for $build_arch"
+        return 1
+    fi
+    if ! tar -xf "./unregistry_$FULL_VERSION.deb"; then
+        echo "❌ Failed to extract unregistry .deb contents for $build_arch"
+        return 1
+    fi
 
     echo "✅ Successfully built unregistry for $build_arch"
     return 0
 }
 
-# docker-pussh is a bash script, so one Architecture: all package per suite
-# covers every architecture.
+# docker-pussh is a bash script, so one Architecture: all package covers
+# every architecture and every suite.
 build_docker_pussh() {
-    for dist in "${DISTS[@]}"; do
-        FULL_VERSION="$unregistry_VERSION-${BUILD_VERSION}~${dist}_all"
-        echo "  Building docker-pussh $FULL_VERSION"
+    FULL_VERSION="$unregistry_VERSION-${BUILD_VERSION}~griffo_all"
+    echo "  Building docker-pussh $FULL_VERSION"
 
-        if ! docker build . -f pDockerfile -t "docker-pussh-$dist" \
-            --build-arg DEBIAN_DIST="$dist" \
-            --build-arg unregistry_VERSION="$unregistry_VERSION" \
-            --build-arg BUILD_VERSION="$BUILD_VERSION" \
-            --build-arg FULL_VERSION="$FULL_VERSION"; then
-            echo "❌ Failed to build docker-pussh image for $dist"
-            return 1
-        fi
+    if ! docker build . -f pDockerfile -t "docker-pussh" \
+        --build-arg unregistry_VERSION="$unregistry_VERSION" \
+        --build-arg BUILD_VERSION="$BUILD_VERSION" \
+        --build-arg FULL_VERSION="$FULL_VERSION"; then
+        echo "❌ Failed to build docker-pussh image"
+        return 1
+    fi
 
-        id="$(docker create "docker-pussh-$dist")"
-        if ! docker cp "$id:/docker-pussh_$FULL_VERSION.deb" - > "./docker-pussh_$FULL_VERSION.deb"; then
-            echo "❌ Failed to extract docker-pussh .deb for $dist"
-            return 1
-        fi
-        if ! tar -xf "./docker-pussh_$FULL_VERSION.deb"; then
-            echo "❌ Failed to extract docker-pussh .deb contents for $dist"
-            return 1
-        fi
-    done
+    id="$(docker create "docker-pussh")"
+    if ! docker cp "$id:/docker-pussh_$FULL_VERSION.deb" - > "./docker-pussh_$FULL_VERSION.deb"; then
+        echo "❌ Failed to extract docker-pussh .deb"
+        return 1
+    fi
+    if ! tar -xf "./docker-pussh_$FULL_VERSION.deb"; then
+        echo "❌ Failed to extract docker-pussh .deb contents"
+        return 1
+    fi
     echo "✅ Successfully built docker-pussh"
 }
 
