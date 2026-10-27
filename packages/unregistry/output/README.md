@@ -72,6 +72,8 @@ ln -sf $(brew --prefix)/bin/docker-pussh ~/.docker/cli-plugins/docker-pussh
 
 ```bash
 # Download the latest version
+
+> Fork of [dariogriffo/unregistry-debian](https://github.com/dariogriffo/unregistry-debian) (MIT); the original packaging is by Dario Griffo. Served at [deb.gaofn.xyz](https://deb.gaofn.xyz) for Debian 12 (bookworm) and 13 (trixie).
 curl -sSL https://raw.githubusercontent.com/psviderski/unregistry/main/docker-pussh \
   -o ~/.docker/cli-plugins/docker-pussh
 

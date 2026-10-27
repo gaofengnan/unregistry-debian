@@ -37,8 +37,8 @@ build_architecture() {
 
     # One package per architecture for every suite: the Go build is static
     # (CGO_ENABLED=0), so only the old ~<suite> version suffix ever differed.
-    # The fixed ~griffo keeps it below the distro's own build of the version.
-    FULL_VERSION="$unregistry_VERSION-${BUILD_VERSION}~griffo_${build_arch}"
+    # The fixed ~gaofn keeps it below the distro's own build of the version.
+    FULL_VERSION="$unregistry_VERSION-${BUILD_VERSION}~gaofn_${build_arch}"
     echo "  Building $FULL_VERSION"
 
     if ! docker build . -f uDockerfile -t "unregistry-$build_arch" \
@@ -68,7 +68,7 @@ build_architecture() {
 # docker-pussh is a bash script, so one Architecture: all package covers
 # every architecture and every suite.
 build_docker_pussh() {
-    FULL_VERSION="$unregistry_VERSION-${BUILD_VERSION}~griffo_all"
+    FULL_VERSION="$unregistry_VERSION-${BUILD_VERSION}~gaofn_all"
     echo "  Building docker-pussh $FULL_VERSION"
 
     if ! docker build . -f pDockerfile -t "docker-pussh" \

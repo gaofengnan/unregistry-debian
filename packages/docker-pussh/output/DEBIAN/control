@@ -1,10 +1,10 @@
 Source: docker-pussh
 Section: utils
 Priority: optional
-Maintainer: Dario Griffo <dariogriffo@gmail.com>
+Maintainer: Fengnan Gao <gao.fengnan@gmail.com>
 Homepage: https://github.com/psviderski/unregistry
 Package: docker-pussh
-Version: unregistry_VERSION-BUILD_VERSION~griffo
+Version: unregistry_VERSION-BUILD_VERSION~gaofn
 Architecture: all
 Depends: bash, openssh-client
 Recommends: docker.io | docker-ce
